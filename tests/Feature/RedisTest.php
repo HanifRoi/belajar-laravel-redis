@@ -12,6 +12,7 @@ use Tests\TestCase;
 use function PHPUnit\Framework\assertEquals;
 use function PHPUnit\Framework\assertEqualsCanonicalizing;
 use function PHPUnit\Framework\assertNull;
+use function PHPUnit\Framework\assertTrue;
 
 class RedisTest extends TestCase
 {
@@ -141,5 +142,13 @@ class RedisTest extends TestCase
         $result = Redis::get('address');
         assertEquals('Indonesia', $result);
     }
-    
+
+    public function testPublish()
+    {
+        for ($i=0; $i < 10; $i++) { 
+            Redis::publish('channel-1', "Hello World $i");
+            Redis::publish('channel-1', "Good Bye $i");
+        }
+        assertTrue(true);
+    }    
 }
