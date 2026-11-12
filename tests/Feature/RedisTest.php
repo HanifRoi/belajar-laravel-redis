@@ -72,5 +72,20 @@ class RedisTest extends TestCase
        $response = Redis::zrange('names', 0, -1);
         assertEquals(['Ganteng', 'Hanif', 'Roihan'], $response); //defaultnya asc
     }
+
+    public function testHash()
+    {
+        Redis::del('user:1');
+        Redis::hset('user:1', 'name', 'Hanif Roihan');
+        Redis::hset('user:1', 'email', 'hanif@gans');
+        Redis::hset('user:1', 'age', 23);
+
+        $response = Redis::hgetall('user:1');
+        assertEquals([
+            'name'=>'Hanif Roihan',
+            'email'=>'hanif@gans',
+            'age'=>'23'//jadi string
+        ], $response);
+    }
     
 }
