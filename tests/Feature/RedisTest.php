@@ -7,10 +7,12 @@ use Illuminate\Support\Facades\Redis;
 use PhpParser\Node\Expr\FuncCall;
 use Predis\Command\Argument\Geospatial\ByRadius;
 use Predis\Command\Argument\Geospatial\FromLonLat;
+use ResourceBundle;
 use Tests\TestCase;
 
 use function PHPUnit\Framework\assertEquals;
 use function PHPUnit\Framework\assertEqualsCanonicalizing;
+use function PHPUnit\Framework\assertNotNull;
 use function PHPUnit\Framework\assertNull;
 use function PHPUnit\Framework\assertTrue;
 
@@ -151,4 +153,41 @@ class RedisTest extends TestCase
         }
         assertTrue(true);
     }    
+
+    public function testPublishStream()
+    {
+        for ($i=0; $i < 10 ; $i++) { 
+            // Gunakan executeRaw untuk mem-bypass bug Predis
+            Redis::connection()->client()->executeRaw([
+                'XADD', 
+                'members', 
+                '*', 
+                'name', "Hanif $i", 
+                'address', 'Indonesia'
+            ]);
+        }
+        assertTrue(true);
+    }
+
+    public function testCreateConsumer()
+    {
+        Redis::connection()->client()->executeRaw([
+            'XGROUP', 'CREATECONSUMER', 'members', 'group1', 'consumer-1'
+        ]);
+
+        assertTrue(true);
+    }
+
+    public function testConsumerStream()
+    {
+       $result = Redis::connection()->client()->executeRaw([
+            'XREADGROUP', 'GROUP', 'group1', 'consumer-1', 
+            'COUNT', 3, 
+            'BLOCK', 3000, 
+            'STREAMS', 'members', '>'
+        ]);
+        assertNotNull($result);
+        echo json_encode($result, JSON_PRETTY_PRINT);
+        
+    }
 }
