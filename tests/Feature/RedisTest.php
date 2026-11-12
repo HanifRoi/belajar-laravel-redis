@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Redis;
 use Tests\TestCase;
 
 use function PHPUnit\Framework\assertEquals;
+use function PHPUnit\Framework\assertEqualsCanonicalizing;
 use function PHPUnit\Framework\assertNull;
 
 class RedisTest extends TestCase
@@ -45,6 +46,20 @@ class RedisTest extends TestCase
         assertEquals('Hanif', Redis::lpop('names'));
         assertEquals('Ganteng', Redis::lpop('names'));
         assertEquals('Roihan', Redis::lpop('names'));
+    }
+
+    public function testSet()
+    {
+        Redis::del('names');
+        Redis::sadd('names', 'Hanif');
+        Redis::sadd('names', 'Hanif');
+        Redis::sadd('names', 'Ganteng');
+        Redis::sadd('names', 'Ganteng');
+        Redis::sadd('names', 'Roihan');
+        Redis::sadd('names', 'Roihan');
+
+        $response = Redis::smembers('names');
+        assertEqualsCanonicalizing(['Hanif', 'Ganteng', 'Roihan'], $response);//cuma data unique
     }
     
 }
