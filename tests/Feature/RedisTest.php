@@ -113,5 +113,19 @@ class RedisTest extends TestCase
         $result = Redis::pfcount('visitors');
         assertEquals(6, $result); //data unique ada 6
     }
+
+    public function testPipeline()
+    {
+        Redis::pipeline(function($pipeline){
+            $pipeline->setEx('name', 2 ,'Hanif');
+            $pipeline->setEx('address', 2 ,'Indonesia');
+        });
+
+        $result = Redis::get('name');
+        assertEquals('Hanif', $result);
+
+        $result = Redis::get('address');
+        assertEquals('Indonesia', $result);
+    }
     
 }
