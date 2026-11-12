@@ -127,5 +127,19 @@ class RedisTest extends TestCase
         $result = Redis::get('address');
         assertEquals('Indonesia', $result);
     }
+
+    public function testTransaction()
+    {
+        Redis::transaction(function($transaction){
+            $transaction->setEx('name', 2 ,'Hanif');
+            $transaction->setEx('address', 2 ,'Indonesia');
+        });
+
+        $result = Redis::get('name');
+        assertEquals('Hanif', $result);
+
+        $result = Redis::get('address');
+        assertEquals('Indonesia', $result);
+    }
     
 }
