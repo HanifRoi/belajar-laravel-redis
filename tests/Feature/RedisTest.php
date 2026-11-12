@@ -61,5 +61,16 @@ class RedisTest extends TestCase
         $response = Redis::smembers('names');
         assertEqualsCanonicalizing(['Hanif', 'Ganteng', 'Roihan'], $response);//cuma data unique
     }
+
+    public function testSortedSet()
+    {
+        Redis::del('names');
+        Redis::zadd('names', 100 , 'Roihan');
+        Redis::zadd('names', 85 , 'Ganteng');
+        Redis::zadd('names', 95 , 'Hanif');
+
+       $response = Redis::zrange('names', 0, -1);
+        assertEquals(['Ganteng', 'Hanif', 'Roihan'], $response); //defaultnya asc
+    }
     
 }
