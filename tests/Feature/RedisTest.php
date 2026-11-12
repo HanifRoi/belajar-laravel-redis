@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 
 use Illuminate\Support\Facades\Redis;
+use Predis\Command\Argument\Geospatial\ByRadius;
+use Predis\Command\Argument\Geospatial\FromLonLat;
 use Tests\TestCase;
 
 use function PHPUnit\Framework\assertEquals;
@@ -86,6 +88,19 @@ class RedisTest extends TestCase
             'email'=>'hanif@gans',
             'age'=>'23'//jadi string
         ], $response);
+    }
+
+    public function testGeoPoint()
+    {
+        Redis::del('sellers');
+        Redis::geoadd('sellers', 109.4942093, -7.6085098, 'Alfamart Selokerto');
+        Redis::geoadd('sellers', 109.4914233, -7.5901979, 'Alfamart Sempor');
+
+        $result = Redis::geodist('sellers', 'Alfamart Selokerto', 'Alfamart Sempor', 'km'); //jarak
+        assertEquals(2.0597, $result);
+
+        $result = Redis::georadius('sellers', 109.495918, -7.594867, 5, 'km');//radius 5km , masih mencakup alfa selokerto dan sempor
+        assertEquals(['Alfamart Selokerto', 'Alfamart Sempor'], $result);
     }
     
 }
