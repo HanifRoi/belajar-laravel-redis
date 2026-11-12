@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 
 use Illuminate\Support\Facades\Redis;
+use PhpParser\Node\Expr\FuncCall;
 use Predis\Command\Argument\Geospatial\ByRadius;
 use Predis\Command\Argument\Geospatial\FromLonLat;
 use Tests\TestCase;
@@ -101,6 +102,16 @@ class RedisTest extends TestCase
 
         $result = Redis::georadius('sellers', 109.495918, -7.594867, 5, 'km');//radius 5km , masih mencakup alfa selokerto dan sempor
         assertEquals(['Alfamart Selokerto', 'Alfamart Sempor'], $result);
+    }
+
+    public function testHyperLogLog()
+    {
+        Redis::pfadd('visitors', 'Hanif', 'Ganteng', 'Roihan');
+        Redis::pfadd('visitors', 'Hanif', 'Budi', 'Joko');
+        Redis::pfadd('visitors', 'Kicaw', 'Budi', 'Joko');
+
+        $result = Redis::pfcount('visitors');
+        assertEquals(6, $result); //data unique ada 6
     }
     
 }
